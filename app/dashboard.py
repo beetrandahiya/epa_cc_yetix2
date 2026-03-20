@@ -35,7 +35,7 @@ from app.quality import compute_completeness, detect_data_quality_issues
 from app.source_discovery import classify_file
 from app.utils import read_csv_flexible
 
-st.set_page_config(page_title="Smart Health Data Mapping", layout="wide")
+st.set_page_config(page_title="Elymetis", layout="wide")
 
 
 @st.cache_resource
@@ -1223,63 +1223,123 @@ def main() -> None:
     strict_ai_validation = bool(cfg.get("ai", {}).get("strict_validation", False))
     strict_ai_max_retries = int(cfg.get("ai", {}).get("strict_max_retries", 0) or 0)
 
-    st.title("Smart Health Data Mapping")
-    st.caption("On-prem, case-centric harmonization and quality monitoring dashboard")
+    st.title("Elymetis")
+    st.caption("Intelligent health data harmonization platform · on-prem and case-centric")
 
     with st.sidebar:
-        st.subheader("Pipeline")
-        st.write("Preprocessing runs once and is cached until source files change.")
-        force = st.checkbox("Force rebuild", value=False)
-        if st.button("Run preprocessing", type="primary"):
-            result = run_pipeline(force=force)
-            st.cache_data.clear()
-            if isinstance(result, dict) and result.get("status") == "skipped":
-                st.info("Preprocessing skipped: sources unchanged and artifacts already present.")
-            else:
-                st.success("Preprocessing finished.")
+        st.markdown("### Elymetis")
+        nav_items = [
+            ("🏠 Overview", "Overview"),
+            ("📊 Benchmark", "Benchmark"),
+            ("✅ Quality & Completeness", "Quality & Completeness"),
+            ("🚨 Anomaly Detection", "Anomaly Detection"),
+            ("📡 Sensor Live Demo", "Sensor Live Demo"),
+            ("🧬 Data Origin & Mapping", "Data Origin & Mapping"),
+            ("📁 File Inspector", "File Inspector"),
+            ("🗂️ Dataset Inspector", "Dataset Inspector"),
+            ("🏥 Clinic 360", "Clinic 360"),
+            ("⬆️ Data Upload", "Data Upload"),
+            ("🧠 Mapping Studio", "Mapping Studio"),
+            ("🛡️ Governance", "Governance"),
+            ("🛠️ Alerts & Corrections", "Alerts & Corrections"),
+            ("📝 PDF / Text AI Extraction", "PDF / Text AI Extraction"),
+        ]
+        valid_tabs = [item[1] for item in nav_items]
+        if "selected_tab" not in st.session_state or st.session_state.get("selected_tab") not in valid_tabs:
+            st.session_state["selected_tab"] = "Overview"
 
-        st.divider()
-        st.subheader("Access")
-        active_user = st.text_input("User ID", value=st.session_state.get("active_user", "analyst1"))
-        role_options = ["admin", "data_steward", "analyst", "viewer"]
-        current_role = st.session_state.get("active_role", "analyst")
-        active_role = st.selectbox(
-            "Role",
-            options=role_options,
-            index=role_options.index(current_role) if current_role in role_options else 2,
-        )
-        st.session_state["active_user"] = active_user.strip() or "anonymous"
-        st.session_state["active_role"] = active_role
-        st.caption(f"Active identity: {st.session_state['active_user']} ({active_role})")
+        for nav_label, nav_value in nav_items:
+            is_active = st.session_state.get("selected_tab") == nav_value
+            if st.button(
+                nav_label,
+                key=f"nav_{nav_value}",
+                use_container_width=True,
+                type="primary" if is_active else "secondary",
+            ):
+                st.session_state["selected_tab"] = nav_value
 
-        st.divider()
-        st.subheader("AI Settings")
-        model = st.text_input("Anthropic model", value=model)
-        api_key_override = st.text_input("Anthropic API key", value="", type="password")
-        if api_key_override.strip():
-            os.environ["ANTHROPIC_API_KEY"] = api_key_override.strip()
-        if st.button("Save API key locally"):
+        selected_tab = st.session_state.get("selected_tab", "Overview")
+
+    st.markdown(
+        """
+        <style>
+        .stApp {background: #f6f8fb;}
+        div[data-testid="stSidebar"] {background: #ffffff; border-right: 1px solid #e9eef5;}
+        div[data-testid="stSidebar"] .block-container {padding-top: 1rem; padding-left: 0.7rem; padding-right: 0.7rem;}
+        div[data-testid="stSidebar"] .stButton {margin-bottom: 8px;}
+        div[data-testid="stSidebar"] .stButton > button {
+            text-align: left;
+            border-radius: 12px;
+            border: 1px solid #e7edf5;
+            padding: 10px 12px;
+            font-weight: 500;
+        }
+        .settings-panel {
+            background: #ffffff;
+            border: 1px solid #e9eef5;
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+        }
+        h1 {letter-spacing: 0.2px;}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown('<div class="settings-panel">', unsafe_allow_html=True)
+    with st.expander("⚙ Settings Panel", expanded=False):
+        st.caption("Pipeline, user access, AI, and display settings")
+        p1, p2 = st.columns([1, 2])
+        with p1:
+            force = st.checkbox("Force rebuild", value=False)
+            if st.button("Run preprocessing", type="primary"):
+                result = run_pipeline(force=force)
+                st.cache_data.clear()
+                if isinstance(result, dict) and result.get("status") == "skipped":
+                    st.info("Preprocessing skipped: sources unchanged and artifacts already present.")
+                else:
+                    st.success("Preprocessing finished.")
+        with p2:
+            role_options = ["admin", "data_steward", "analyst", "viewer"]
+            active_user = st.text_input("User ID", value=st.session_state.get("active_user", "analyst1"))
+            current_role = st.session_state.get("active_role", "analyst")
+            active_role = st.selectbox(
+                "Role",
+                options=role_options,
+                index=role_options.index(current_role) if current_role in role_options else 2,
+            )
+            st.session_state["active_user"] = active_user.strip() or "anonymous"
+            st.session_state["active_role"] = active_role
+            st.caption(f"Active identity: {st.session_state['active_user']} ({active_role})")
+
+        a1, a2 = st.columns(2)
+        with a1:
+            model = st.text_input("Anthropic model", value=model)
+            api_key_override = st.text_input("Anthropic API key", value="", type="password")
             if api_key_override.strip():
-                persist_api_key_to_env(api_key_override.strip())
-                st.success("API key saved to local .env for future sessions.")
-            else:
-                st.warning("Enter an API key first, then click save.")
-        st.write("Use environment variable ANTHROPIC_API_KEY or paste a key above for this session.")
-
-        st.divider()
-        st.subheader("Display Mode")
-        display_mode_label = st.radio(
-            "Field naming",
-            options=["Machine-readable (COE)", "Human-readable (IID-SID-ITEM)"],
-            index=0,
-        )
-        label_language = st.radio("Label language", options=["de", "en"], index=0, horizontal=True)
+                os.environ["ANTHROPIC_API_KEY"] = api_key_override.strip()
+            if st.button("Save API key locally"):
+                if api_key_override.strip():
+                    persist_api_key_to_env(api_key_override.strip())
+                    st.success("API key saved to local .env for future sessions.")
+                else:
+                    st.warning("Enter an API key first, then click save.")
+            st.caption("Use environment variable ANTHROPIC_API_KEY or paste a key above for this session.")
+        with a2:
+            display_mode_label = st.radio(
+                "Field naming",
+                options=["Machine-readable (COE)", "Human-readable (IID-SID-ITEM)"],
+                index=0,
+            )
+            label_language = st.radio("Label language", options=["de", "en"], index=0, horizontal=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
     display_mode = "human" if "Human-readable" in display_mode_label else "machine"
     coe_labels = get_coe_label_lookup(cfg["paths"]["iid_sid_map_file"], language=label_language)
 
     if not Path(db_path).exists():
-        st.info("Processed database not found. Click 'Run preprocessing' in the sidebar.")
+        st.info("Processed database not found. Open Settings Panel and click 'Run preprocessing'.")
         return
 
     ensure_governance_tables(db_path)
@@ -1292,26 +1352,7 @@ def main() -> None:
     if not metadata.empty and "pipeline_duration_ms" in metadata.columns:
         st.caption(f"Last full pipeline duration: {metadata.iloc[-1]['pipeline_duration_ms']} ms")
 
-    tab_overview, tab_benchmark, tab_quality, tab_anomaly, tab_sensor_live, tab_lineage, tab_file_inspector, tab_dataset_inspector, tab_clinic_360, tab_data_upload, tab_mapping_studio, tab_governance, tab_corrections, tab_ai = st.tabs(
-        [
-            "Overview",
-            "Benchmark",
-            "Quality & Completeness",
-            "Anomaly Detection",
-            "Sensor Live Demo",
-            "Data Origin & Mapping",
-            "File Inspector",
-            "Dataset Inspector",
-            "Clinic 360",
-            "Data Upload",
-            "Mapping Studio",
-            "Governance",
-            "Alerts & Corrections",
-            "PDF / Text AI Extraction",
-        ]
-    )
-
-    with tab_overview:
+    if selected_tab == "Overview":
         case_df = load_table(db_path, "tbCaseData")
         labs_df = load_table(db_path, "tbImportLabsData")
         nursing_df = load_table(db_path, "tbImportNursingDailyReportsData")
@@ -1355,7 +1396,7 @@ def main() -> None:
         else:
             st.info("No step metrics available yet. Run preprocessing once.")
 
-    with tab_benchmark:
+    if selected_tab == "Benchmark":
         st.subheader("Benchmark")
         st.write("Track mapping accuracy, AI extraction accuracy, and missingness improvement before/after harmonization.")
 
@@ -1467,7 +1508,7 @@ def main() -> None:
                 "annualized € uses a configurable default labor rate of 45 €/hour; prevented-error proxy combines approved review interventions and applied corrections."
             )
 
-    with tab_quality:
+    if selected_tab == "Quality & Completeness":
         st.subheader("Completeness Metrics")
         completeness = load_table(db_path, "dq_completeness")
         issues = load_table(db_path, "dq_issues")
@@ -1513,7 +1554,7 @@ def main() -> None:
         else:
             st.success("No quality issues detected.")
 
-    with tab_anomaly:
+    if selected_tab == "Anomaly Detection":
         st.subheader("Detected Anomalies")
         anomalies = load_table(db_path, "dq_anomalies")
         if anomalies.empty:
@@ -1524,7 +1565,7 @@ def main() -> None:
             st.plotly_chart(fig, width="stretch")
             st.dataframe(anomalies_view, width="stretch")
 
-    with tab_sensor_live:
+    if selected_tab == "Sensor Live Demo":
         st.subheader("Sensor Live Demo")
         st.write("Simulate realistic multi-device patient monitoring streams with real-time style anomaly alerts.")
 
@@ -1658,7 +1699,7 @@ def main() -> None:
                 mime="text/csv",
             )
 
-    with tab_lineage:
+    if selected_tab == "Data Origin & Mapping":
         st.subheader("Field Origin and Mapping")
         lineage = load_table(db_path, "mapping_lineage")
         source_catalog = load_table(db_path, "source_file_catalog")
@@ -1694,7 +1735,7 @@ def main() -> None:
             st.plotly_chart(px.bar(domain_counts, x="source_domain", y="count", title="Discovered Files by Domain"), width="stretch")
             st.dataframe(source_catalog, width="stretch", height=260)
 
-    with tab_file_inspector:
+    if selected_tab == "File Inspector":
         st.subheader("Raw → Normalized → Processed File Inspector")
         source_catalog = load_table(db_path, "source_file_catalog")
         if source_catalog.empty:
@@ -1742,7 +1783,7 @@ def main() -> None:
                     st.write(f"Rows previewed: {len(processed[table_pick])}")
                     st.dataframe(apply_display_to_columns(processed[table_pick], display_mode, coe_labels), width="stretch", height=280)
 
-    with tab_dataset_inspector:
+    if selected_tab == "Dataset Inspector":
         st.subheader("Dataset Health & Origin Inspector")
         dataset_choices = ["tbCaseData"] + list_import_tables(db_path)
         dataset = st.selectbox("Select dataset", dataset_choices)
@@ -1810,7 +1851,7 @@ def main() -> None:
                 st.markdown("**Anomalies**")
                 st.dataframe(anomaly_view, width="stretch", height=220)
 
-    with tab_clinic_360:
+    if selected_tab == "Clinic 360":
         st.subheader("Clinic 360")
         st.write("View all discovered source files and consolidated records for a selected clinic.")
 
@@ -2009,7 +2050,7 @@ def main() -> None:
             else:
                 st.caption("PDF export requires reportlab in the environment. Markdown export is fully available.")
 
-    with tab_data_upload:
+    if selected_tab == "Data Upload":
         st.subheader("Upload New Data")
         st.write("Upload new CSV/PDF files into ingestion folders and optionally trigger preprocessing.")
 
@@ -2057,7 +2098,7 @@ def main() -> None:
                 st.markdown("**Upload Results**")
                 st.dataframe(upload_results, width="stretch", height=240)
 
-    with tab_mapping_studio:
+    if selected_tab == "Mapping Studio":
         st.subheader("Mapping Studio")
         st.write("AI-first column harmonization with human approval. Accepted mappings are persisted and reused.")
         st.caption("Context rule enforced in AI prompt: German 'Fall' means case/encounter, not a physical floor-fall.")
@@ -2326,7 +2367,7 @@ def main() -> None:
                             st.info("Review item rejected.")
                             st.cache_data.clear()
 
-    with tab_governance:
+    if selected_tab == "Governance":
         st.subheader("Governance & Audit")
         st.write("Track access role, mapping/correction actions, and confidence-gated review decisions.")
 
@@ -2363,7 +2404,7 @@ def main() -> None:
             else:
                 st.dataframe(queue_df, width="stretch", height=220)
 
-    with tab_corrections:
+    if selected_tab == "Alerts & Corrections":
         st.subheader("Alerts and Manual Corrections")
         issues = load_table(db_path, "dq_issues")
         st.write("Use this panel to review flagged records and create a correction patch file.")
@@ -2418,7 +2459,7 @@ def main() -> None:
                 mime="text/csv",
             )
 
-    with tab_ai:
+    if selected_tab == "PDF / Text AI Extraction":
         st.subheader("AI Extraction for PDF and Free Text")
         schema_hint = st.text_area(
             "Target schema hint (JSON template or field list)",
