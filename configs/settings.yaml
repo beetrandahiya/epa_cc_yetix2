@@ -1,0 +1,45 @@
+paths:
+  raw_root: .
+  processed_root: data/processed
+  duckdb_file: data/processed/health_mapping.duckdb
+  iid_sid_map_file: IID-SID-ITEM.csv
+  pdf_inbox_dir: data/pdf_inbox
+
+input_files:
+  epa_data_1: Endtestdaten_ohne_Fehler_ einheitliche ID/epaAC-Data-1.csv
+  epa_data_2: Endtestdaten_ohne_Fehler_ einheitliche ID/epaAC-Data-2.csv
+  epa_data_3: Endtestdaten_ohne_Fehler_ einheitliche ID/epaAC-Data-3.csv
+  labs: Endtestdaten_ohne_Fehler_ einheitliche ID/synth_labs_1000_cases.csv
+  device_motion: Endtestdaten_ohne_Fehler_ einheitliche ID/synthetic_device_motion_fall_data.csv
+  device_1hz: Endtestdaten_ohne_Fehler_ einheitliche ID/synthetic_device_raw_1hz_motion_fall.csv
+  medication: Endtestdaten_ohne_Fehler_ einheitliche ID/synthetic_medication_raw_inpatient.csv
+  nursing: Endtestdaten_ohne_Fehler_ einheitliche ID/synthetic_nursing_daily_reports_en.csv
+  icd_ops: Endtestdaten_ohne_Fehler_ einheitliche ID/synthetic_cases_icd10_ops.csv
+
+input_roots:
+  - Endtestdaten_ohne_Fehler_ einheitliche ID
+  - Endtestdaten_mit_Fehlern_ einheitliche ID
+  - Checkdata
+
+rules:
+  required_fields:
+    - case_id
+    - patient_id
+  null_like_values:
+    - "NULL"
+    - "Missing"
+    - "unknow"
+    - "NaN"
+    - "N/A"
+    - ""
+  epa_required_fields:
+    - coE0I001
+    - coE2I225
+    - coE2I222
+
+ai:
+  anthropic_model: claude-haiku-4-5
+  enable_ai_enrichment: true
+  max_ai_rows_per_run: 20
+  strict_validation: true
+  strict_max_retries: 2

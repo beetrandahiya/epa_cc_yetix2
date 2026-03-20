@@ -1,0 +1,11 @@
+pandas>=2.2.0
+numpy>=1.26.0
+streamlit>=1.41.0
+plotly>=5.24.0
+duckdb>=1.1.0
+python-dateutil>=2.9.0
+PyYAML>=6.0.2
+pypdf>=5.1.0
+anthropic>=0.47.0
+scikit-learn>=1.5.0
+reportlab>=4.2.0

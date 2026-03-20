@@ -1,0 +1,4 @@
+case_id,patient_id,ward,report_date,shift,nursing_note_free_text
+6000,306000,Pneumologie,2026-02-05,Late shift,"Spätdienst: Mobilized with assistance, Restful night sleep, Fluid intake adequate. Interventions: Pressure ulcer prevention implemented, Family discussion conducted. Evaluation: Condition stable."
+2300,102300,Innere Medizin,2026-02-24,Night shift,"Nachtdienst: Pain score 5/10 in surgical area, Wound without irritation, dry, No bowel movement for 2 days, Restful night sleep. Interventions: Blood glucose monitored, Family discussion conducted. Evaluation: Close monitoring still required."
+4000,204000,Innere Medizin,2026-02-09,Night shift,"Nachtdienst: Called staff multiple times during the night, Restful night sleep, No acute pain reported, Fluid intake below 1 liter. Interventions: Pressure ulcer prevention implemented, Fluid balance documented, Vital signs checked. Evaluation: Patient appears anxious, support conversation offered."

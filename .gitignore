@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Local runtime data / caches
+data/processed/*.duckdb
+data/processed/*.duckdb.wal
+data/processed/*.duckdb.tmp
+data/processed/*.parquet
+data/processed/*.json
+.streamlit/

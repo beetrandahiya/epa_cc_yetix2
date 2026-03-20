@@ -1,0 +1,4 @@
+case_id,patient_id,ward,admission_date,discharge_date,length_of_stay_days,primary_icd10_code,primary_icd10_description_en,secondary_icd10_codes,secondary_icd10_descriptions_en,ops_codes,ops_descriptions_en
+6000,306000,Pneumologie,2026-02-02,2026-02-20,19,J96.0,Acute respiratory failure,N17.9; E86; I10,"Acute kidney failure, unspecified; Volume depletion; Essential (primary) hypertension",1-632.0,Diagnostic bronchoscopy
+2300,102300,Innere Medizin,2026-01-20,2026-01-26,7,I50.1,Left ventricular failure,Z74.1,Need for assistance with personal care,8-800.c0; 1-632.0,Intravenous medication administration; Diagnostic bronchoscopy
+4000,204000,Innere Medizin,2026-02-08,2026-02-11,4,K92.2,"Gastrointestinal hemorrhage, unspecified",E86,Volume depletion,8-800.c0,Intravenous medication administration
